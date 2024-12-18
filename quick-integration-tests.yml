@@ -1,14 +1,14 @@
 trigger:
   branches:
     include:
-      - main
+      - main  # Only trigger builds automatically on the 'main' branch
 
 pr:
   branches:
     include:
-      - '*'
+      - '*'   # Include all branches for pull request builds
     exclude:
-      - 'currency/*'
+      - 'refs/heads/currency/*'  # Exclude branches starting with 'currency/*'
 
 jobs:
   - job: DebugBranchInfo
@@ -17,14 +17,18 @@ jobs:
       - script: |
           echo "Source Branch: $(System.PullRequest.SourceBranch)"
           echo "Target Branch: $(System.PullRequest.TargetBranch)"
+          if [[ "$(System.PullRequest.SourceBranch)" == refs/heads/currency/* ]]; then
+            echo "The source branch is excluded as per the rule."
+          else
+            echo "The source branch is NOT excluded."
+          fi
         displayName: 'Debug Branch Information'
       
   - job: MainJob
     displayName: 'Main Job'
     dependsOn: DebugBranchInfo
-    #condition: and(succeeded(), not(contains(variables['Build.SourceBranch'], 'refs/heads/currency/')))  # Exclude branches starting with 'currency/*'
+    condition: and(succeeded(), not(contains(variables['Build.SourceBranch'], 'refs/heads/currency/')))  # Ensure the job skips 'currency/*'
     steps:
       - script: |
           echo "Running Main Job because the source branch is not excluded."
         displayName: 'Run Main Job'
-#test
