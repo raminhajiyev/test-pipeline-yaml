@@ -9,6 +9,7 @@ pr:
       - '*'
     exclude:
       - 'currency/*'
+      - 'quick-integration-tests.yml'
 
 jobs:
   - job: DebugBranchInfo
